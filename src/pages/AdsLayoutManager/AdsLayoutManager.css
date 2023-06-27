@@ -1,0 +1,11 @@
+
+.region {
+    position: absolute;
+    background: rgb(0, 0, 0);
+}
+
+.logo{
+    width: auto;
+    height: auto;
+    max-width: 100%;
+}

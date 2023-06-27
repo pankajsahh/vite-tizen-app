@@ -1,22 +1,7 @@
-// import { useState } from "react";
-// import "./App.css";
-// import LoadingPage from "./pages/Loading";
-
-// function App() {
-//   const [UserValid, setUserValid] = useState(false);
-
-//   return <LoadingPage setUserValid={setUserValid} />;
-// }
-
-// export default App;
-
-
-
 import  { useState, useEffect } from "react";
-import "./App.css";
 import LoadingPage from "./pages/Loading";
 import LoginPage from "./pages/Login";
-import AdsPlayer from "./pages/AdsPlayer";
+import AdsLayoutManager from "./pages/AdsLayoutManager";
 
 function App() {
   const [userValid, setUserValid] = useState(false);
@@ -25,7 +10,7 @@ function App() {
   useEffect(() => {
     const timer = setTimeout(() => {
       setShowLoadingPage(false);
-    }, 10000);
+    }, 1000);
     return () => clearTimeout(timer);
   }, []);
 
@@ -34,7 +19,7 @@ function App() {
       {showLoadingPage ? (
         <LoadingPage setUserValid={setUserValid} />
       ) : userValid ? (
-        <AdsPlayer />
+        <AdsLayoutManager/>
       ) : (
         <LoginPage />
       )}
