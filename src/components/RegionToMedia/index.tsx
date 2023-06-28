@@ -16,14 +16,15 @@ function RegionToMedia({ Region }: AdsPlayerType) {
   async function FindMediaDataForRegin(region: Region) {
     const setOfIdsOfMedia = new Set<string>();
     let getCurrentMediadata = await retrieveDataFromIndexedDB("newtvData");
+    let webPages = [];
     if (region && region.media) {
       if (Array.isArray(region.media)) {
         region.media.forEach((media) => {
           if (media["@attributes"]?.type === "webpage") {
-            getCurrentMediadata.push({
+            webPages.push({
               id: "212",
               type: "webpage",
-              data: media.options.uri,
+              data: media.options.uri["#text"],
             });
           }
 
@@ -32,10 +33,10 @@ function RegionToMedia({ Region }: AdsPlayerType) {
         });
       } else if (typeof region.media === "object") {
         if (region.media["@attributes"]?.type === "webpage") {
-          getCurrentMediadata.push({
+          webPages.push({
             id: "212",
             type: "webpage",
-            data: region.media.options.uri,
+            data: region.media.options.uri["#text"],
           });
         }
 
@@ -52,13 +53,15 @@ function RegionToMedia({ Region }: AdsPlayerType) {
       getCurrentMediadata,
       "filterd data to be displayed region ye h"
     );
-
-    setmediaData(
-      getCurrentMediadata.filter((item: MediaDatatype) => {
-        return setOfIdsOfMedia.has(item.id);
-      })
-    );
+    setmediaData( [
+        ...webPages,
+        ...getCurrentMediadata.filter((item: MediaDatatype) => {
+          return setOfIdsOfMedia.has(item.id);
+        }),
+      ]);
   }
+
+console.log(MediaData),"media data ";
 
   useEffect(() => {
     FindMediaDataForRegin(Region);

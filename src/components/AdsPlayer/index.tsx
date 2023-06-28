@@ -4,7 +4,7 @@ import { MediaDatatype } from "../RegionToMedia";
 
 function AdsPlayer({ MediaData }: { MediaData: MediaDatatype[] }) {
   const [currentIndex, setCurrentIndex] = useState(0);
-
+  console.log(MediaData, " this is media data");
   useEffect(() => {
     let timeout: number | undefined;
     if (MediaData[currentIndex]) {
@@ -23,6 +23,16 @@ function AdsPlayer({ MediaData }: { MediaData: MediaDatatype[] }) {
       {MediaData.length ? (
         <>
           {MediaData[currentIndex] &&
+            MediaData[currentIndex].type === "webpage" && (
+              <iframe
+                style={{ background: "white" }}
+                height="100%"
+                width="100%"
+                src={decodeURIComponent(MediaData[currentIndex].data)}
+                title="webPage"
+              ></iframe>
+            )}
+          {MediaData[currentIndex] &&
             MediaData[currentIndex].type === "Image" && (
               <img
                 src={"data:image/png;base64," + MediaData[currentIndex].data}
@@ -35,14 +45,16 @@ function AdsPlayer({ MediaData }: { MediaData: MediaDatatype[] }) {
             MediaData[currentIndex].type === "video" && (
               <video
                 onEnded={() => {
-                  setCurrentIndex(
-                    (prevIndex) => (prevIndex + 1) % MediaData.length
-                  );
+                  if (MediaData.length > 1)
+                    setCurrentIndex(
+                      (prevIndex) => (prevIndex + 1) % MediaData.length
+                    );
                 }}
                 id="videoElement"
                 className="videoPlayer"
                 autoPlay
                 muted
+                loop={MediaData.length <= 1}
               >
                 <source
                   src={"data:video/mp4;base64," + MediaData[currentIndex].data}
