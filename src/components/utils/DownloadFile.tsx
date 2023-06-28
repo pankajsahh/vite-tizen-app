@@ -1,8 +1,8 @@
 import { updateDataInIndexedDB } from "./DB";
+import { readFileAsURI, saveBase64ImageToFile } from "./FileSystemTizen";
 import xmlToJson from "./XmlToJSON";
 
 export default async function FeatchNewResourceData(item: any) {
-    console.log(item)
   var parser = new DOMParser();
   var myHeaders2 = new Headers();
   myHeaders2.append("Content-Type", "application/xml");
@@ -28,6 +28,16 @@ export default async function FeatchNewResourceData(item: any) {
       requestOptions
     );
     const result_1 = await response.text();
+
+    await saveBase64ImageToFile(
+      xmlToJson(parser.parseFromString(result_1, "text/xml"))[
+        "SOAP-ENV:Envelope"
+      ]["SOAP-ENV:Body"]["ns1:GetFileResponse"].file["#text"],
+      item["@attributes"].path
+    );
+
+    const url = await readFileAsURI(item["@attributes"].path);
+
     let newObject = {
       id: item["@attributes"].id,
       type:
@@ -36,15 +46,21 @@ export default async function FeatchNewResourceData(item: any) {
             ? "video"
             : "Image"
           : "layout",
-      data: xmlToJson(parser.parseFromString(result_1, "text/xml"))[
-        "SOAP-ENV:Envelope"
-      ]["SOAP-ENV:Body"]["ns1:GetFileResponse"].file["#text"],
+      data: url,
     };
-    if (item["@attributes"].type === "layout" ||  item["@attributes"].type === "resource") {
-      const decodedString = atob(newObject.data);
+
+    if (
+      item["@attributes"].type === "layout" ||
+      item["@attributes"].type === "resource"
+    ) {
+      const decodedString = atob(
+        xmlToJson(parser.parseFromString(result_1, "text/xml"))[
+          "SOAP-ENV:Envelope"
+        ]["SOAP-ENV:Body"]["ns1:GetFileResponse"].file["#text"]
+      );
       let data_2 = parser.parseFromString(decodedString, "text/xml");
       updateDataInIndexedDB("Layout", xmlToJson(data_2)["layout"]);
-      console.log(xmlToJson(data_2)["layout"],"this is layout data")
+      console.log(xmlToJson(data_2)["layout"], "this is layout data");
       return undefined;
     } else {
       return newObject;
